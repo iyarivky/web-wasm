@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Web Converter</title>
+    <script src="main.wasm.js"></script>
+    <script>
+        async function convertText() {
+            const inputText = document.getElementById('inputText').value;
+            const convertedText = await window.convertToExclamation(inputText);
+            document.getElementById('outputText').textContent = convertedText;
+        }
+    </script>
+</head>
+<body>
+    <h1>Web Converter</h1>
+    <textarea id="inputText" rows="4" cols="50" placeholder="Masukkan teks..."></textarea><br>
+    <button onclick="convertText()">Convert</button><br>
+    <h2>Hasil:</h2>
+    <div id="outputText"></div>
+</body>
+</html>

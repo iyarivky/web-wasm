@@ -78,6 +78,8 @@ struct TrojanUrlInfo {
     multiplex: MultiplexInfo,
 }
 
+//try to figure how use function in rust
+
 fn parse_urls(vray_urls: Vec<String>) -> Vec<ConfigResult> {
 
 }

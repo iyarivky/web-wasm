@@ -1,3 +1,4 @@
+//test github cli
 function parseUrls(vrayUrls) {
     const vrayUrlsLength = vrayUrls.length;
     const results = [];

@@ -1,4 +1,4 @@
-//test github cli
+//test github cli a
 function parseUrls(vrayUrls) {
     const vrayUrlsLength = vrayUrls.length;
     const results = [];

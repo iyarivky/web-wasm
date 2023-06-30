@@ -2,30 +2,31 @@ use serde_json::{json, Result, Value};
 use url::Url;
 
 fn print_vmess_protocol(url: &Url) -> Value {
-    let scheme = url.scheme();
-
     json!({
         "tag": "Ini config Vmess",
-        "protocol": scheme
+        "protocol": url.scheme()
     })
 }
 
 fn print_vless_protocol(url: &Url) -> Value {
-    let scheme = url.scheme();
     let fragment = url.fragment();
 
     let mut json_obj = json!({
         "tag": fragment,
-        "protocol": scheme
+        "protocol": url.scheme()
     });
 
-    if url.port().map(|p| p == 443).unwrap_or(false) || url.query_pairs().any(|(key, _)| key == "security") {
-        if let Some(server_name) = url.query_pairs().find(|(key, _)| key == "sni").map(|(_, value)| value.into_owned()) {
-            json_obj["tls"] = json!({
-                "enabled": true,
-                "server_name": server_name,
-                "insecure": true
-            });
+    if let Some(port) = url.port() {
+        let is_tls_enabled = port == 443 && url.query_pairs().any(|(key, value)| key == "security" && value == "tls");
+        if is_tls_enabled {
+            if let Some(server_name) = url.query_pairs().find(|(key, _)| key == "sni").map(|(_, value)| value.into_owned()) {
+                let tls_obj = json!({
+                    "enabled": true,
+                    "server_name": server_name,
+                    "insecure": true
+                });
+                json_obj["tls"] = tls_obj;
+            }
         }
     }
 
@@ -33,21 +34,24 @@ fn print_vless_protocol(url: &Url) -> Value {
 }
 
 fn print_trojan_protocol(url: &Url) -> Value {
-    let scheme = url.scheme();
     let fragment = url.fragment();
 
     let mut json_obj = json!({
         "tag": fragment,
-        "protocol": scheme
+        "protocol": url.scheme()
     });
 
-    if url.port().map(|p| p == 443).unwrap_or(false) || url.query_pairs().any(|(key, _)| key == "security") {
-        if let Some(server_name) = url.query_pairs().find(|(key, _)| key == "sni").map(|(_, value)| value.into_owned()) {
-            json_obj["tls"] = json!({
-                "enabled": true,
-                "server_name": server_name,
-                "insecure": true
-            });
+    if let Some(port) = url.port() {
+        let is_tls_enabled = port == 443 && url.query_pairs().any(|(key, value)| key == "security" && value == "tls");
+        if is_tls_enabled {
+            if let Some(server_name) = url.query_pairs().find(|(key, _)| key == "sni").map(|(_, value)| value.into_owned()) {
+                let tls_obj = json!({
+                    "enabled": true,
+                    "server_name": server_name,
+                    "insecure": true
+                });
+                json_obj["tls"] = tls_obj;
+            }
         }
     }
 

@@ -170,9 +170,17 @@ struct HttpUrlInfo {
     tls: Option<TlsInfo>
 }
 
-//try to figure how use function in rust
+//Converter Function
 
-pub fn print_protocol_for_urls(urls: &[&str]) -> Result<()> {
+fn vmess_urls_to_json()
+fn vless_urls_to_json()
+fn trojan_urls_to_json()
+fn shadowsocks_urls_to_json()
+fn shadowsocksr_urls_to_json()
+fn socks_urls_to_json()
+fn http_urls_to_json()
+
+pub fn print_url_to_json(urls: &[&str]) -> Result<()> {
     let mut output: Vec<Value> = Vec::new();
 
     for url_str in urls.iter() {
@@ -180,9 +188,14 @@ pub fn print_protocol_for_urls(urls: &[&str]) -> Result<()> {
             Ok(url) => {
                 let scheme = url.scheme();
                 let json_obj = match scheme {
-                    "vmess" => print_vmess_protocol(&url),
-                    "vless" => print_vless_protocol(&url),
-                    "trojan" => print_trojan_protocol(&url),
+                    "vmess" => vmess_urls_to_json(&url),
+                    "vless" => vless_urls_to_json(&url),
+                    "trojan" => trojan_urls_to_json(&url),
+                    "ss" => shadowsocks_urls_to_json(&url),
+                    "ssr" => shadowsocksr_urls_to_json()(&url),
+                    "socks5" => socks_urls_to_json(&url),
+                    "http" => http_urls_to_json(&url),
+                    "https" => http_urls_to_json(&url),
                     _ => {
                         eprintln!("Unsupported protocol: {}", scheme);
                         continue;
@@ -202,10 +215,14 @@ pub fn print_protocol_for_urls(urls: &[&str]) -> Result<()> {
     Ok(())
 }
 
-fn vmess_urls()
-fn vless_urls()
-fn trojan_urls()
-fn shadowsocks_urls()
-fn shadowsocksr_urls()
-fn socks_urls()
-fn http_urls()
+fn main(){
+  let vray_account = [
+    "vmess://eyJhZGQiOiAic2cyLXJheS5pcHNlcnZlcnMueHl6IiwgImhvc3QiOiAic25pLmNsb3VkZmxhcmUuY29tIiwgImFpZCI6IDAsICJ0eXBlIjogIiIsICJwYXRoIjogIi9KQUdPQU5TU0gvIiwgIm5ldCI6ICJ3cyIsICJwcyI6ICJqYWdvYW5zc2gtZ29kZGFtbiIsICJ0bHMiOiAidGxzIiwgInR5cGUiOiAibm9uZSIsICJwb3J0IjogIjQ0MyIsICJ2IjogIjIiLCAiaWQiOiAiNGE0NWU0NzctY2ZhMS00YTBmLWEwYjAtZTQ1MTczYzYyZjViIn0=",
+    "vless://a771070c-b93e-4f72-8747-657f4a41ead9@sglws.mainssh.xyz:443?path=/vless&security=tls&encryption=none&host=sglws.mainssh.xyz&type=ws&sni=sglws.mainssh.xyz#mainssh-legendo",
+    "trojan://6d9fdac3-d74b-435f-aa6b-5fbf36e06853@sg1.xvless.xyz:443?host=sg1.xvless.xyz&path=%2Ftrojan&sni=sg1.xvless.xyz&type=ws#sshocean-ainian",
+    "trojan://dbedf072-d917-41cd-b106-3aa3bb2f29a4@idt4.sshocean.net:443?mode=gun&security=tls&type=grpc&serviceName=grpc&sni=sni.cloudflare.net#sshocean-pengentest_Trojan_gRPC",
+    ]
+
+  let parsevray_to_json = 
+
+}

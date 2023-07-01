@@ -114,7 +114,9 @@ struct TrojanUrlInfo {
     server: String,
     server_port: u16,
     password: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     transport: Option<TransportInfo>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     tls: Option<TlsInfo>,
     multiplex: MultiplexInfo,
 }
@@ -139,10 +141,12 @@ struct ShadowsocksRUrlInfo {
     r#type: String,
     server: String,
     server_port: u16,
+    method: String,
     password: String,
-    transport: Option<TransportInfo>,
-    tls: Option<TlsInfo>,
-    multiplex: MultiplexInfo,
+    obfs: String,
+    obfs_param: String,
+    protocol: String
+    protocol_param: String,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -167,6 +171,7 @@ struct HttpUrlInfo {
     password: String,
     path: String,
     headers: HeadersInfo,
+    #[serde(skip_serializing_if = "Option::is_none")]
     tls: Option<TlsInfo>
 }
 

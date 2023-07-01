@@ -1,43 +1,45 @@
 use url::Url;
 use serde_derive::{Serialize, Deserialize};
-use serde_json;
+use serde_json::{json, Value};
+use std::error::Error;
+use std::result::Result;
 
-#[derive(Serialize, Deserialize)] //Multiplex
+#[derive(Serialize, Deserialize)]
 struct MultiplexInfo {
     enable: bool,
     protocol: String,
     max_stream: u16,
 }
 
-#[derive(Serialize, Deserialize)] //uTLS
+#[derive(Serialize, Deserialize)]
 struct UtlsInfo {
     enabled: bool,
     fingerprint: String,
 }
 
-#[derive(Serialize, Deserialize)] // Reality Handshake
+#[derive(Serialize, Deserialize)]
 struct RealityHandshakeInfo {
-  server: String,
-  server_port: u16,
+    server: String,
+    server_port: u16,
 }
 
-#[derive(Serialize, Deserialize)] // Reality
+#[derive(Serialize, Deserialize)]
 struct RealityInfo {
-  enabled: bool,
-  public_key: String,
+    enabled: bool,
+    public_key: String,
 }
 
-#[derive(Serialize, Deserialize)] // TLS
+#[derive(Serialize, Deserialize)]
 struct TlsInfo {
     enable: bool,
     server_name: String,
     insecure: bool,
     disable_sni: bool,
-    utls:UtlsInfo,
-    reality:RealityInfo
+    utls: UtlsInfo,
+    reality: RealityInfo,
 }
 
-#[derive(Serialize, Deserialize)] // V2Ray Transport (HTTP,WS,gRPC,QUIC)
+#[derive(Serialize, Deserialize)]
 struct V2rayTransportInfo {
     r#type: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,22 +57,20 @@ struct V2rayTransportInfo {
     #[serde(skip_serializing_if = "Option::is_none")]
     ping_timeout: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    permit_without_stream: Option<bool>
+    permit_without_stream: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize)] //for HTTP and V2Ray Transport (WS and HTTP)
+#[derive(Serialize, Deserialize)]
 #[allow(non_snake_case)]
 struct HeadersInfo {
     Host: String,
 }
 
-#[derive(Serialize, Deserialize)] // UDP over TCP (for Shadowsocks and Socks)
-struct UdpOverTcpInfo{
-  enable: bool,
-  version: u16
+#[derive(Serialize, Deserialize)]
+struct UdpOverTcpInfo {
+    enable: bool,
+    version: u16,
 }
-
-// all outbound
 
 #[derive(Serialize, Deserialize)]
 struct VmessUrlInfo {
@@ -86,7 +86,7 @@ struct VmessUrlInfo {
     packet_encoding: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     tls: Option<TlsInfo>,
-    transport: Option<TransportInfo>,
+    transport: Option<V2rayTransportInfo>,
     multiplex: MultiplexInfo,
 }
 
@@ -104,7 +104,7 @@ struct VlessUrlInfo {
     #[serde(skip_serializing_if = "Option::is_none")]
     tls: Option<TlsInfo>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    transport: Option<TransportInfo>,
+    transport: Option<V2rayTransportInfo>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -115,7 +115,7 @@ struct TrojanUrlInfo {
     server_port: u16,
     password: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    transport: Option<TransportInfo>,
+    transport: Option<V2rayTransportInfo>,
     #[serde(skip_serializing_if = "Option::is_none")]
     tls: Option<TlsInfo>,
     multiplex: MultiplexInfo,
@@ -145,7 +145,7 @@ struct ShadowsocksRUrlInfo {
     password: String,
     obfs: String,
     obfs_param: String,
-    protocol: String
+    protocol: String,
     protocol_param: String,
 }
 
@@ -158,7 +158,7 @@ struct SocksUrlInfo {
     version: String,
     username: String,
     password: String,
-    udp_over_tcp: UdpOverTcpInfo
+    udp_over_tcp: UdpOverTcpInfo,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -172,20 +172,152 @@ struct HttpUrlInfo {
     path: String,
     headers: HeadersInfo,
     #[serde(skip_serializing_if = "Option::is_none")]
-    tls: Option<TlsInfo>
+    tls: Option<TlsInfo>,
 }
 
-//Converter Function
+fn vmess_urls_to_json(url: &Url) -> Result<Value, Box<dyn Error>> {
+    let info = VmessUrlInfo {
+        tag: "".to_string(),
+        r#type: "".to_string(),
+        server: "".to_string(),
+        server_port: 0,
+        uuid: "".to_string(),
+        security: "".to_string(),
+        alter_id: 0,
+        global_padding: false,
+        authenticated_length: false,
+        packet_encoding: "".to_string(),
+        tls: None,
+        transport: None,
+        multiplex: MultiplexInfo {
+            enable: false,
+            protocol: "".to_string(),
+            max_stream: 0,
+        },
+    };
+    let json_obj = json!(info);
+    Ok(json_obj)
+}
 
-fn vmess_urls_to_json()
-fn vless_urls_to_json()
-fn trojan_urls_to_json()
-fn shadowsocks_urls_to_json()
-fn shadowsocksr_urls_to_json()
-fn socks_urls_to_json()
-fn http_urls_to_json()
+fn vless_urls_to_json(url: &Url) -> Result<Value, Box<dyn Error>> {
+    let info = VlessUrlInfo {
+        tag: "".to_string(),
+        r#type: "".to_string(),
+        server: "".to_string(),
+        server_port: 0,
+        uuid: "".to_string(),
+        flow: "".to_string(),
+        packet_encoding: "".to_string(),
+        security: "".to_string(),
+        multiplex: MultiplexInfo {
+            enable: false,
+            protocol: "".to_string(),
+            max_stream: 0,
+        },
+        tls: None,
+        transport: None,
+    };
+    let json_obj = json!(info);
+    Ok(json_obj)
+}
 
-pub fn print_url_to_json(urls: &[&str]) -> Result<()> {
+fn trojan_urls_to_json(url: &Url) -> Result<Value, Box<dyn Error>> {
+    let info = TrojanUrlInfo {
+        tag: "".to_string(),
+        r#type: "".to_string(),
+        server: "".to_string(),
+        server_port: 0,
+        password: "".to_string(),
+        transport: None,
+        tls: None,
+        multiplex: MultiplexInfo {
+            enable: false,
+            protocol: "".to_string(),
+            max_stream: 0,
+        },
+    };
+    let json_obj = json!(info);
+    Ok(json_obj)
+}
+
+fn shadowsocks_urls_to_json(url: &Url) -> Result<Value, Box<dyn Error>> {
+    let info = ShadowsocksUrlInfo {
+        tag: "".to_string(),
+        r#type: "".to_string(),
+        server: "".to_string(),
+        server_port: 0,
+        method: "".to_string(),
+        password: "".to_string(),
+        plugin: "".to_string(),
+        plugin_opts: "".to_string(),
+        udp_over_tcp: UdpOverTcpInfo {
+            enable: false,
+            version: 0,
+        },
+        multiplex: MultiplexInfo {
+            enable: false,
+            protocol: "".to_string(),
+            max_stream: 0,
+        },
+    };
+    let json_obj = json!(info);
+    Ok(json_obj)
+}
+
+fn shadowsocksr_urls_to_json(url: &Url) -> Result<Value, Box<dyn Error>> {
+    let info = ShadowsocksRUrlInfo {
+        tag: "".to_string(),
+        r#type: "".to_string(),
+        server: "".to_string(),
+        server_port: 0,
+        method: "".to_string(),
+        password: "".to_string(),
+        obfs: "".to_string(),
+        obfs_param: "".to_string(),
+        protocol: "".to_string(),
+        protocol_param: "".to_string(),
+    };
+    let json_obj = json!(info);
+    Ok(json_obj)
+}
+
+fn socks_urls_to_json(url: &Url) -> Result<Value, Box<dyn Error>> {
+    let info = SocksUrlInfo {
+        tag: "".to_string(),
+        r#type: "".to_string(),
+        server: "".to_string(),
+        server_port: 0,
+        version: "".to_string(),
+        username: "".to_string(),
+        password: "".to_string(),
+        udp_over_tcp: UdpOverTcpInfo {
+            enable: false,
+            version: 0,
+        },
+    };
+    let json_obj = json!(info);
+    Ok(json_obj)
+}
+
+fn http_urls_to_json(url: &Url) -> Result<Value, Box<dyn Error>> {
+    let info = HttpUrlInfo {
+        tag: "".to_string(),
+        r#type: "".to_string(),
+        server: "".to_string(),
+        server_port: 0,
+        username: "".to_string(),
+        password: "".to_string(),
+        path: "".to_string(),
+        headers: HeadersInfo {
+            Host: "".to_string(),
+        },
+        tls: None,
+    };
+    let json_obj = json!(info);
+    Ok(json_obj)
+}
+
+pub fn print_url_to_json(urls: &[&str]) -> Result<(), Box<dyn Error>> {
     let mut output: Vec<Value> = Vec::new();
 
     for url_str in urls.iter() {
@@ -197,19 +329,25 @@ pub fn print_url_to_json(urls: &[&str]) -> Result<()> {
                     "vless" => vless_urls_to_json(&url),
                     "trojan" => trojan_urls_to_json(&url),
                     "ss" => shadowsocks_urls_to_json(&url),
-                    "ssr" => shadowsocksr_urls_to_json()(&url),
+                    "ssr" => shadowsocksr_urls_to_json(&url),
                     "socks5" => socks_urls_to_json(&url),
-                    "http" => http_urls_to_json(&url),
-                    "https" => http_urls_to_json(&url),
+                    "http" | "https" => http_urls_to_json(&url),
                     _ => {
                         eprintln!("Unsupported protocol: {}", scheme);
                         continue;
                     }
                 };
-                output.push(json_obj);
+                match json_obj {
+                    Ok(json) => output.push(json),
+                    Err(e) => {
+                        eprintln!("Error converting URL to JSON: {}", e);
+                        continue;
+                    }
+                }
             }
             Err(e) => {
                 eprintln!("Error parsing URL: {}", e);
+                continue;
             }
         }
     }
@@ -220,14 +358,15 @@ pub fn print_url_to_json(urls: &[&str]) -> Result<()> {
     Ok(())
 }
 
-fn main(){
-  let vray_account = [
+fn main() {
+    let urls = [
     "vmess://eyJhZGQiOiAic2cyLXJheS5pcHNlcnZlcnMueHl6IiwgImhvc3QiOiAic25pLmNsb3VkZmxhcmUuY29tIiwgImFpZCI6IDAsICJ0eXBlIjogIiIsICJwYXRoIjogIi9KQUdPQU5TU0gvIiwgIm5ldCI6ICJ3cyIsICJwcyI6ICJqYWdvYW5zc2gtZ29kZGFtbiIsICJ0bHMiOiAidGxzIiwgInR5cGUiOiAibm9uZSIsICJwb3J0IjogIjQ0MyIsICJ2IjogIjIiLCAiaWQiOiAiNGE0NWU0NzctY2ZhMS00YTBmLWEwYjAtZTQ1MTczYzYyZjViIn0=",
     "vless://a771070c-b93e-4f72-8747-657f4a41ead9@sglws.mainssh.xyz:443?path=/vless&security=tls&encryption=none&host=sglws.mainssh.xyz&type=ws&sni=sglws.mainssh.xyz#mainssh-legendo",
     "trojan://6d9fdac3-d74b-435f-aa6b-5fbf36e06853@sg1.xvless.xyz:443?host=sg1.xvless.xyz&path=%2Ftrojan&sni=sg1.xvless.xyz&type=ws#sshocean-ainian",
     "trojan://dbedf072-d917-41cd-b106-3aa3bb2f29a4@idt4.sshocean.net:443?mode=gun&security=tls&type=grpc&serviceName=grpc&sni=sni.cloudflare.net#sshocean-pengentest_Trojan_gRPC",
-    ]
+    ];
 
-  let parsevray_to_json = 
-
+    if let Err(e) = print_url_to_json(&urls) {
+        eprintln!("Error: {}", e);
+    }
 }
